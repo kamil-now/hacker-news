@@ -1,10 +1,10 @@
 # Hacker News API
 
+## Description
 This project is a .NET 8 web application that provides an API to fetch the best stories from Hacker News.
 
 ## Prerequisites
-- .NET 8 SDK or later installed
--  [Docker](https://docs.docker.com/get-docker/) installed on your machine
+[Docker](https://docs.docker.com/get-docker/) installed on your machine
 
 The Docker Desktop installer usually sets up the Docker daemon as a Windows service, which starts automatically when you log in to your system. 
 
