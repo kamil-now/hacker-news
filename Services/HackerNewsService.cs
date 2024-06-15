@@ -2,7 +2,7 @@ using HackerNews.Models;
 
 namespace HackerNews.Services;
 
-public class HackerNewsService(IHttpClientFactory httpClientFactory, IConfiguration configuration) : IHackerNewsService
+public class HackerNewsService(IHttpClientFactory httpClientFactory, ICacheService cache, IConfiguration configuration) : IHackerNewsService
 {
   readonly string BestStoriesUrl = configuration.GetSection("HackerNewsAPI:BestStoriesUrl")?.Value 
     ?? throw new Exception("Missing configuration for HackerNewsAPI:BestStoriesUrl");
@@ -11,11 +11,18 @@ public class HackerNewsService(IHttpClientFactory httpClientFactory, IConfigurat
 
   public async Task<IEnumerable<Story>?> TryGetBestStoriesAsync(int n)
   {
+    var cachedStories = await cache.TryGetStoriesFromCacheAsync(n);
+    if (cachedStories != null)
+    {
+      return cachedStories;
+    }
+
     var stories = await QueryHackerNewsAPIAsync(n);
     if (stories == null)
     {
       return null;
     }
+    await cache.SaveStoriesInCacheAsync(stories);
 
     return stories;
   }

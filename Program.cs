@@ -5,8 +5,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+});
+
 builder.Services.AddHttpClient();
 
+builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddSingleton<IHackerNewsService, HackerNewsService>();
 
 var app = builder.Build();
