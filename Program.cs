@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using HackerNews.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,12 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddOptions();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddSingleton<IHackerNewsService, HackerNewsService>();
 
@@ -24,6 +31,8 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hacker News V1");
 });
 app.UseHttpsRedirection();
+
+app.UseIpRateLimiting();
 
 app.MapGet("/api/best-stories/{n:int}", async (int n, IHackerNewsService service) =>
 {
